@@ -1,0 +1,53 @@
+<html><head><title>Readers Writers</title>
+<style>
+body{font-family:Arial;margin:30px;background:#f2f2f2}
+.event{padding:12px;margin:8px;background:white;border-left:5px solid #2563eb}
+button{padding:10px;margin:5px;cursor:pointer}
+</style></head><body>
+<h1>Readers-Writers Simulation</h1>
+<p>Events recorded by the Java program</p>
+<button onclick='nextEvent()'>Next Event</button>
+<button onclick='play()'>Play</button>
+<button onclick='pause()'>Pause</button>
+<button onclick='resetEvents()'>Reset</button>
+<h3 id='status'>Ready</h3>
+<div id='timeline'>
+<div class='event' style='display:none'>1. Reader1 : Waitting Active readers: 0 Waiting readers: 1 Waiting writers: 0 Resource: Available</div>
+<div class='event' style='display:none'>2. Reader1 : Entered reading Section Active readers: 1 Waiting readers: 0 Waiting writers: 0 Resource: Reading</div>
+<div class='event' style='display:none'>3. Reader2 : Waitting Active readers: 1 Waiting readers: 1 Waiting writers: 0 Resource: Reading</div>
+<div class='event' style='display:none'>4. Reader2 : Entered reading Section Active readers: 2 Waiting readers: 0 Waiting writers: 0 Resource: Reading</div>
+<div class='event' style='display:none'>5. Writer2 : Waitting Active readers: 2 Waiting readers: 0 Waiting writers: 1 Resource: Reading</div>
+<div class='event' style='display:none'>6. Reader3 : Waitting Active readers: 2 Waiting readers: 1 Waiting writers: 1 Resource: Reading</div>
+<div class='event' style='display:none'>7. Reader3 : Entered reading Section Active readers: 3 Waiting readers: 0 Waiting writers: 1 Resource: Reading</div>
+<div class='event' style='display:none'>8. Writer1 : Waitting Active readers: 3 Waiting readers: 0 Waiting writers: 2 Resource: Reading</div>
+<div class='event' style='display:none'>9. Reader2 : Exited reading section Active readers: 2 Waiting readers: 0 Waiting writers: 2 Resource: Reading</div>
+<div class='event' style='display:none'>10. Reader1 : Exited reading section Active readers: 1 Waiting readers: 0 Waiting writers: 2 Resource: Reading</div>
+<div class='event' style='display:none'>11. Writer2 : Enter writing section Active readers: 0 Waiting readers: 0 Waiting writers: 1 Resource: Writting</div>
+<div class='event' style='display:none'>12. Reader3 : Exited reading section Active readers: 0 Waiting readers: 0 Waiting writers: 1 Resource: Writting</div>
+<div class='event' style='display:none'>13. Writer2 : Exited writting section Active readers: 0 Waiting readers: 0 Waiting writers: 1 Resource: Available</div>
+<div class='event' style='display:none'>14. Writer1 : Enter writing section Active readers: 0 Waiting readers: 0 Waiting writers: 0 Resource: Writting</div>
+<div class='event' style='display:none'>15. Writer1 : Exited writting section Active readers: 0 Waiting readers: 0 Waiting writers: 0 Resource: Available</div>
+</div>
+<script>
+let current=0;
+let timer=null;
+let items=document.getElementsByClassName('event');
+function nextEvent(){
+if(current<items.length){
+items[current].style.display='block';
+current++;
+document.getElementById('status').innerText='Event '+current+' of '+items.length;
+}else{pause();}}
+function play(){
+if(timer===null){
+timer=setInterval(function(){
+if(current<items.length){nextEvent();}
+else{pause();}
+},1000);}}
+function pause(){clearInterval(timer);timer=null;}
+function resetEvents(){
+pause();current=0;
+for(let i=0;i<items.length;i++){
+items[i].style.display='none';}
+document.getElementById('status').innerText='Ready';}
+</script></body></html>
