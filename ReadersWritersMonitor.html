@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html><head><title>Readers-Writers Monitor</title>
+<meta charset='UTF-8'>
+<style>
+body{font-family:Arial;background:#eef2f7;margin:0;color:#1e293b}
+header{background:#172554;color:white;padding:22px;text-align:center}
+.container{max-width:1100px;margin:25px auto;padding:0 15px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:15px}
+.card{background:white;padding:18px;border-radius:10px;box-shadow:0 2px 8px #0001}
+.number{font-size:28px;font-weight:bold;margin-top:10px}
+.resource{text-align:center;border-top:5px solid #64748b}
+.process{border-left:5px solid #94a3b8;margin-top:10px}
+.active{border-left-color:#16a34a}
+.waiting{border-left-color:#f59e0b}
+.finished{border-left-color:#2563eb}
+.controls{margin:20px 0}
+button{padding:10px 18px;margin:4px;border:0;border-radius:6px;background:#1d4ed8;color:white;cursor:pointer}
+button:hover{background:#1e40af}
+.event{background:white;padding:14px;margin:10px 0;border-radius:7px;border-left:5px solid #94a3b8}
+.event.current{background:#dbeafe;border-left-color:#2563eb}
+.small{color:#64748b;font-size:13px}
+</style></head><body>
+<header>
+<h1>Readers-Writers Simulation</h1>
+<p>Monitor-Based Synchronization in Java</p>
+</header>
+<div class='container'>
+<div class='card resource'>
+<h3>Shared Resource</h3>
+<div class='number' id='resource'>AVAILABLE</div>
+<p id='description'>Waiting to start simulation</p>
+</div>
+<h2>System Status</h2>
+<div class='grid'>
+<div class='card'>Active Readers<div class='number' id='ar'>0</div></div>
+<div class='card'>Waiting Readers<div class='number' id='wr'>0</div></div>
+<div class='card'>Waiting Writers<div class='number' id='ww'>0</div></div>
+<div class='card'>Writer Active<div class='number' id='wa'>No</div></div>
+</div>
+<h2>Reader and Writer Processes</h2>
+<div class='grid'>
+<div class='card process' id='Reader-1'>
+<h3>Reader-1</h3>
+<p class='processState'>NOT STARTED</p>
+</div>
+<div class='card process' id='Reader-2'>
+<h3>Reader-2</h3>
+<p class='processState'>NOT STARTED</p>
+</div>
+<div class='card process' id='Reader-3'>
+<h3>Reader-3</h3>
+<p class='processState'>NOT STARTED</p>
+</div>
+<div class='card process' id='Writer-1'>
+<h3>Writer-1</h3>
+<p class='processState'>NOT STARTED</p>
+</div>
+<div class='card process' id='Writer-2'>
+<h3>Writer-2</h3>
+<p class='processState'>NOT STARTED</p>
+</div>
+</div>
+<div class='card controls'>
+<h2>Execution Controls</h2>
+<button onclick='nextEvent()'>Next Event</button>
+<button onclick='play()'>Play</button>
+<button onclick='pause()'>Pause</button>
+<button onclick='resetEvents()'>Reset</button>
+<p id='progress'>Ready</p>
+<p class='small'>Each step represents an event recorded by the Java program.</p>
+</div>
+<h2>Execution Timeline</h2>
+<div id='timeline'>
+<div class='event' style='display:none'
+ data-actor='Reader-1'
+ data-state='WAITING'
+ data-ar='0'
+ data-wr='1'
+ data-ww='0'
+ data-resource='AVAILABLE'>
+<b>Event 1</b><br>
+Reader-1 : WAITING | Active Readers: 0 | Waiting Readers: 1 | Waiting Writers: 0 | Resource: AVAILABLE
+</div>
+<div class='event' style='display:none'
+ data-actor='Reader-1'
+ data-state='ENTERED READING SECTION'
+ data-ar='1'
+ data-wr='0'
+ data-ww='0'
+ data-resource='READING'>
+<b>Event 2</b><br>
+Reader-1 : ENTERED READING SECTION | Active Readers: 1 | Waiting Readers: 0 | Waiting Writers: 0 | Resource: READING
+</div>
+<div class='event' style='display:none'
+ data-actor='Reader-2'
+ data-state='WAITING'
+ data-ar='1'
+ data-wr='1'
+ data-ww='0'
+ data-resource='READING'>
+<b>Event 3</b><br>
+Reader-2 : WAITING | Active Readers: 1 | Waiting Readers: 1 | Waiting Writers: 0 | Resource: READING
+</div>
+<div class='event' style='display:none'
+ data-actor='Reader-2'
+ data-state='ENTERED READING SECTION'
+ data-ar='2'
+ data-wr='0'
+ data-ww='0'
+ data-resource='READING'>
+<b>Event 4</b><br>
+Reader-2 : ENTERED READING SECTION | Active Readers: 2 | Waiting Readers: 0 | Waiting Writers: 0 | Resource: READING
+</div>
+<div class='event' style='display:none'
+ data-actor='Writer-1'
+ data-state='WAITING'
+ data-ar='2'
+ data-wr='0'
+ data-ww='1'
+ data-resource='READING'>
+<b>Event 5</b><br>
+Writer-1 : WAITING | Active Readers: 2 | Waiting Readers: 0 | Waiting Writers: 1 | Resource: READING
+</div>
+<div class='event' style='display:none'
+ data-actor='Writer-2'
+ data-state='WAITING'
+ data-ar='2'
+ data-wr='0'
+ data-ww='2'
+ data-resource='READING'>
+<b>Event 6</b><br>
+Writer-2 : WAITING | Active Readers: 2 | Waiting Readers: 0 | Waiting Writers: 2 | Resource: READING
+</div>
+<div class='event' style='display:none'
+ data-actor='Reader-3'
+ data-state='WAITING'
+ data-ar='2'
+ data-wr='1'
+ data-ww='2'
+ data-resource='READING'>
+<b>Event 7</b><br>
+Reader-3 : WAITING | Active Readers: 2 | Waiting Readers: 1 | Waiting Writers: 2 | Resource: READING
+</div>
+<div class='event' style='display:none'
+ data-actor='Reader-1'
+ data-state='EXITED READING SECTION'
+ data-ar='1'
+ data-wr='1'
+ data-ww='2'
+ data-resource='READING'>
+<b>Event 8</b><br>
+Reader-1 : EXITED READING SECTION | Active Readers: 1 | Waiting Readers: 1 | Waiting Writers: 2 | Resource: READING
+</div>
+<div class='event' style='display:none'
+ data-actor='Reader-2'
+ data-state='EXITED READING SECTION'
+ data-ar='0'
+ data-wr='1'
+ data-ww='2'
+ data-resource='AVAILABLE'>
+<b>Event 9</b><br>
+Reader-2 : EXITED READING SECTION | Active Readers: 0 | Waiting Readers: 1 | Waiting Writers: 2 | Resource: AVAILABLE
+</div>
+<div class='event' style='display:none'
+ data-actor='Writer-1'
+ data-state='ENTERED WRITING SECTION'
+ data-ar='0'
+ data-wr='1'
+ data-ww='1'
+ data-resource='WRITING'>
+<b>Event 10</b><br>
+Writer-1 : ENTERED WRITING SECTION | Active Readers: 0 | Waiting Readers: 1 | Waiting Writers: 1 | Resource: WRITING
+</div>
+<div class='event' style='display:none'
+ data-actor='Writer-1'
+ data-state='EXITED WRITING SECTION'
+ data-ar='0'
+ data-wr='1'
+ data-ww='1'
+ data-resource='AVAILABLE'>
+<b>Event 11</b><br>
+Writer-1 : EXITED WRITING SECTION | Active Readers: 0 | Waiting Readers: 1 | Waiting Writers: 1 | Resource: AVAILABLE
+</div>
+<div class='event' style='display:none'
+ data-actor='Writer-2'
+ data-state='ENTERED WRITING SECTION'
+ data-ar='0'
+ data-wr='1'
+ data-ww='0'
+ data-resource='WRITING'>
+<b>Event 12</b><br>
+Writer-2 : ENTERED WRITING SECTION | Active Readers: 0 | Waiting Readers: 1 | Waiting Writers: 0 | Resource: WRITING
+</div>
+<div class='event' style='display:none'
+ data-actor='Writer-2'
+ data-state='EXITED WRITING SECTION'
+ data-ar='0'
+ data-wr='1'
+ data-ww='0'
+ data-resource='AVAILABLE'>
+<b>Event 13</b><br>
+Writer-2 : EXITED WRITING SECTION | Active Readers: 0 | Waiting Readers: 1 | Waiting Writers: 0 | Resource: AVAILABLE
+</div>
+<div class='event' style='display:none'
+ data-actor='Reader-3'
+ data-state='ENTERED READING SECTION'
+ data-ar='1'
+ data-wr='0'
+ data-ww='0'
+ data-resource='READING'>
+<b>Event 14</b><br>
+Reader-3 : ENTERED READING SECTION | Active Readers: 1 | Waiting Readers: 0 | Waiting Writers: 0 | Resource: READING
+</div>
+<div class='event' style='display:none'
+ data-actor='Reader-3'
+ data-state='EXITED READING SECTION'
+ data-ar='0'
+ data-wr='0'
+ data-ww='0'
+ data-resource='AVAILABLE'>
+<b>Event 15</b><br>
+Reader-3 : EXITED READING SECTION | Active Readers: 0 | Waiting Readers: 0 | Waiting Writers: 0 | Resource: AVAILABLE
+</div>
+</div></div>
+<script>
+let current=0;
+let timer=null;
+let items=document.getElementsByClassName('event');
+function showEvent(){
+if(current>=items.length){pause();return;}
+let e=items[current];
+e.style.display='block';
+e.classList.add('current');
+document.getElementById('resource').innerText=e.dataset.resource;
+document.getElementById('ar').innerText=e.dataset.ar;
+document.getElementById('wr').innerText=e.dataset.wr;
+document.getElementById('ww').innerText=e.dataset.ww;
+document.getElementById('wa').innerText=e.dataset.resource==='WRITING'?'Yes':'No';
+document.getElementById('description').innerText=e.dataset.actor+' - '+e.dataset.state;
+document.getElementById('progress').innerText='Event '+(current+1)+' of '+items.length;
+let p=document.getElementById(e.dataset.actor);
+if(p){
+let s=p.getElementsByClassName('processState')[0];
+let state=e.dataset.state;
+s.innerText=state;
+p.classList.remove('active','waiting','finished');
+if(state==='WAITING')p.classList.add('waiting');
+else if(state.indexOf('ENTERED')>=0)p.classList.add('active');
+else if(state.indexOf('EXITED')>=0)p.classList.add('finished');
+}
+current++;
+}
+function nextEvent(){
+if(current<items.length)showEvent();
+else pause();
+}
+function play(){
+if(timer===null){
+timer=setInterval(nextEvent,1200);
+}}
+function pause(){
+clearInterval(timer);
+timer=null;
+}
+function resetEvents(){
+pause();current=0;
+for(let i=0;i<items.length;i++){
+items[i].style.display='none';
+items[i].classList.remove('current');
+}
+let p=document.getElementsByClassName('process');
+for(let i=0;i<p.length;i++){
+p[i].classList.remove('active','waiting','finished');
+p[i].getElementsByClassName('processState')[0].innerText='NOT STARTED';
+}
+document.getElementById('resource').innerText='AVAILABLE';
+document.getElementById('description').innerText='Waiting to start simulation';
+document.getElementById('ar').innerText='0';
+document.getElementById('wr').innerText='0';
+document.getElementById('ww').innerText='0';
+document.getElementById('wa').innerText='No';
+document.getElementById('progress').innerText='Ready';
+}
+</script></body></html>
